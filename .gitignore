@@ -189,10 +189,10 @@ dataset/raw/
 
 # Specific reference data folders (large datasets)
 references/NLA-SLR/data/
-references/TwoStreamNetwork/data/*/videos/
-references/TwoStreamNetwork/data/*/features/
+references/TwoStreamNetwork/data/
 references/Online/CSLR/data/
 references/Online/SLT/data/
+references/Online/CTC_fusion/data/
 
 # Pose/landmark extracted files
 *.npy
