@@ -1,5 +1,27 @@
 # Quick Reference: Base Paper Integration & Dataset Strategy
 
+## Training & Deployment Architecture
+
+### Training Environment: Google Colab (GPU)
+- **GPU Acceleration:** Tesla T4/V100/A100 provided by Colab
+- **Sliding-Window Inference:** Fast processing of continuous sign sequences (window size: 64 frames)
+- **Dataset Access:** Google Drive mounted for iSign DB access
+- **Checkpointing:** Model checkpoints auto-saved to Drive
+- **Logging:** TensorBoard integration for experiment tracking
+
+### Deployment: Local Webcam (CPU)
+- **Real-time Processing:** Webcam-based inference runs locally
+- **Browser Limitations:** Google Colab cannot access local webcam due to sandbox restrictions
+- **Model Loading:** Download trained model from Colab/Drive to local system
+- **Inference Mode:** CPU-only sufficient for real-time recognition (<500ms latency)
+
+### Why This Architecture?
+1. **Training:** Requires GPU (hours of training) → Colab provides free GPU access
+2. **Deployment:** Requires webcam access → Must run locally for real-time capture
+3. **Sliding-Window:** Enables efficient processing of continuous sign sequences without full-sequence buffering
+
+---
+
 ## For PPT Slides & Review Presentations
 
 ### Base Paper (Must Mention First)
@@ -77,11 +99,34 @@
 
 **Implementation:**
 ```
-Phase 1 (Weeks 1-4): Train on MS-ASL → Validate architecture
+Phase 1 (Weeks 1-4): Train on MS-ASL (Colab GPU) → Validate architecture
 Phase 2 (Week 5):     Replace vocab head with ISL
-Phase 3 (Weeks 6-8):  Fine-tune on iSign DB (freeze→unfreeze)
-Phase 4 (Weeks 9-10): Train ISL language models
+Phase 3 (Weeks 6-8):  Fine-tune on iSign DB (Colab GPU, sliding-window)
+Phase 4 (Weeks 9-10): Train ISL language models (Colab)
+Phase 5 (Week 11):    Deploy to local system (webcam inference)
 ```
+
+### Deployment Strategy
+
+**Training Pipeline (Google Colab):**
+1. Mount Google Drive with iSign DB dataset
+2. Train dual-stream model with GPU acceleration
+3. Use sliding-window inference (64 frames) for continuous sequences
+4. Save checkpoints to Drive
+5. Evaluate with WER/BLEU metrics
+
+**Deployment Pipeline (Local System):**
+1. Download trained model from Colab/Drive
+2. Install lightweight inference dependencies (CPU-only PyTorch)
+3. Run webcam capture locally (cv2.VideoCapture)
+4. Apply sliding-window inference on real-time frames
+5. Output text + TTS audio
+
+**Why Separate Training/Deployment?**
+- Colab cannot access local webcam (browser sandbox)
+- Training requires GPU (expensive locally, free on Colab)
+- Inference runs efficiently on CPU (<500ms latency)
+- Sliding-window enables real-time continuous recognition
 
 ---
 

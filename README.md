@@ -33,15 +33,49 @@ This project implements a comprehensive **continuous sign language recognition a
 
 ## 🚀 Installation
 
-### Prerequisites
+### Training Environment (Google Colab)
+
+**The model training and evaluation use Google Colab with GPU acceleration:**
+- GPU: Tesla T4/V100/A100 (provided by Colab)
+- CUDA 12.1+ support
+- Sliding-window inference for fast processing
+- Mount Google Drive for dataset access
+
+### Local Deployment Prerequisites
 
 - Python 3.12 or higher
-- CUDA 12.1+ (for GPU support)
 - FFmpeg (for video processing)
-- 16GB+ RAM (recommended)
-- GPU with 8GB+ VRAM (recommended for training)
+- 8GB+ RAM
+- Webcam (for real-time inference)
+- **Note:** Real-time webcam deployment runs locally due to browser sandbox limitations
 
 ### Setup
+
+#### For Training on Google Colab
+
+1. **Open in Colab**
+   - Navigate to the training notebook in `references/NLA-SLR/`
+   - Click "Open in Colab" badge
+   
+2. **Setup Colab environment**
+   ```python
+   # Mount Google Drive for dataset access
+   from google.colab import drive
+   drive.mount('/content/drive')
+   
+   # Clone repository
+   !git clone https://github.com/Kathir-Kalidass/CLSR.git
+   %cd CLSR
+   
+   # Install dependencies (PyTorch pre-installed in Colab)
+   !pip install -r application/requirements.txt
+   ```
+
+3. **Enable GPU acceleration**
+   - Runtime → Change runtime type → GPU (T4/V100/A100)
+   - Verify: `!nvidia-smi`
+
+#### For Local Deployment (Webcam Inference)
 
 1. **Clone the repository**
    ```bash
@@ -59,11 +93,7 @@ This project implements a comprehensive **continuous sign language recognition a
 
 3. **Install dependencies**
    ```bash
-   # For GPU (CUDA 12.1)
-   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-   pip install -r application/requirements.txt
-   
-   # For CPU only
+   # CPU-only (sufficient for inference)
    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
    pip install -r application/requirements.txt
    ```
@@ -72,6 +102,7 @@ This project implements a comprehensive **continuous sign language recognition a
    ```bash
    python -c "import torch; print(f'PyTorch: {torch.__version__}')"
    python -c "import mediapipe; print('MediaPipe: OK')"
+   python -c "import cv2; print(f'OpenCV: {cv2.__version__}')"
    ```
 
 ## 📚 Documentation
@@ -143,31 +174,51 @@ CTC Decoding → Translation → Grammar Correction → TTS → Text + Speech
 
 ## 🎯 Usage
 
-### Training
+### Training (Google Colab)
 
-```bash
+**All model training is performed on Google Colab with GPU acceleration:**
+
+```python
+# In Colab notebook
 # Train dual-stream model with attention fusion
-python references/NLA-SLR/training.py --config configs/nla_slr_wlasl_1000.yaml
+!python references/NLA-SLR/training.py --config configs/nla_slr_wlasl_1000.yaml --gpu 0
 
-# Fine-tune on ISL
-python references/NLA-SLR/training.py --config configs/nla_slr_isl.yaml --pretrained checkpoints/asl_model.pth
+# Fine-tune on ISL with sliding-window inference
+!python references/NLA-SLR/training.py \
+    --config configs/nla_slr_isl.yaml \
+    --pretrained checkpoints/asl_model.pth \
+    --sliding-window --window-size 64
 ```
 
-### Inference
+**Features:**
+- GPU acceleration (T4/V100/A100)
+- Sliding-window inference for continuous sign sequences
+- Checkpoints auto-saved to Google Drive
+- TensorBoard logging
+
+### Evaluation (Google Colab)
+
+```python
+# Compute WER/BLEU metrics on test set
+!python references/NLA-SLR/evaluation.py \
+    --test-set /content/drive/MyDrive/iSign_DB/test/ \
+    --model checkpoints/best_model.pth \
+    --sliding-window
+```
+
+### Inference (Local - Webcam)
+
+**Real-time webcam deployment runs locally due to browser sandbox limitations:**
 
 ```bash
-# Predict on single video
+# Download trained model from Colab/Drive
+# Place in checkpoints/
+
+# Run real-time webcam inference
+python application/realtime_inference.py --camera 0 --model checkpoints/best_model.pth
+
+# Or process pre-recorded video
 python references/NLA-SLR/prediction.py --video path/to/video.mp4 --model checkpoints/best_model.pth
-
-# Real-time webcam inference
-python application/realtime_inference.py --camera 0
-```
-
-### Evaluation
-
-```bash
-# Compute WER/BLEU metrics
-python references/NLA-SLR/evaluation.py --test-set path/to/test/ --model checkpoints/best_model.pth
 ```
 
 ## 📁 Project Structure

@@ -5,6 +5,31 @@ This document provides a high-level overview of the complete system architecture
 
 ---
 
+## Training & Deployment Architecture
+
+### Training Environment: Google Colab
+- **GPU Acceleration:** Tesla T4/V100/A100 (free tier available)
+- **Dataset Storage:** Google Drive mounted for iSign DB access
+- **Training Pipeline:** Full model training with GPU compute
+- **Sliding-Window Inference:** Efficient continuous sequence processing (64-frame windows)
+- **Checkpointing:** Automatic save to Google Drive
+- **Monitoring:** TensorBoard integration for loss/metrics tracking
+
+### Deployment Environment: Local System
+- **Webcam Access:** Real-time video capture (cv2.VideoCapture)
+- **CPU Inference:** Lightweight inference without GPU requirement
+- **Browser Limitation:** Colab cannot access local webcam due to sandbox restrictions
+- **Model Loading:** Download trained checkpoint from Colab/Drive
+- **Real-Time Processing:** <500ms latency with sliding-window approach
+
+### Why This Split?
+1. **Training requires GPU** (hours of compute) → Colab provides free GPU
+2. **Deployment requires webcam** (local hardware) → Must run on local machine
+3. **Sliding-window enables real-time continuous recognition** without full buffering
+4. **Cost-effective:** Free Colab GPU + consumer-grade local CPU
+
+---
+
 ## 1. System Architecture Philosophy
 
 The proposed architecture follows **five core design principles**:

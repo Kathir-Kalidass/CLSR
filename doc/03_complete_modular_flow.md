@@ -5,6 +5,75 @@ This document provides **detailed, box-by-box** descriptions of every module in 
 
 ---
 
+## Training & Deployment Environments
+
+### Training Pipeline (Google Colab)
+**Purpose:** Train and evaluate models with GPU acceleration
+
+**Environment Setup:**
+```python
+# Mount Google Drive
+from google.colab import drive
+drive.mount('/content/drive')
+
+# Verify GPU
+!nvidia-smi
+
+# Install dependencies
+!pip install -r application/requirements.txt
+```
+
+**Training Features:**
+- **GPU Acceleration:** Tesla T4/V100/A100 (CUDA 12.1+)
+- **Sliding-Window Training:** Process continuous sequences with 64-frame windows
+- **Batch Processing:** Multiple windows per sequence for efficiency
+- **Checkpointing:** Auto-save to Google Drive every N epochs
+- **Monitoring:** TensorBoard logging (loss, WER, BLEU)
+
+**Sliding-Window Inference:**
+```
+Continuous Sign Sequence (300 frames)
+    ↓
+[Window 1: frames 0-63]   → Model → Output 1
+[Window 2: frames 32-95]  → Model → Output 2  (50% overlap)
+[Window 3: frames 64-127] → Model → Output 3
+    ...
+    ↓
+Merge overlapping predictions → Final gloss sequence
+```
+
+**Benefits:**
+- No need to buffer entire sequence (memory efficient)
+- Faster inference than full-sequence processing
+- Handles variable-length sequences naturally
+
+### Deployment Pipeline (Local System)
+**Purpose:** Real-time webcam inference with trained model
+
+**Environment Requirements:**
+- Python 3.12+ with CPU-only PyTorch
+- Webcam (cv2.VideoCapture)
+- Downloaded model checkpoint from Colab/Drive
+- <500ms latency target
+
+**Why Local Deployment?**
+- Google Colab **cannot access local webcam** (browser sandbox restrictions)
+- Real-time capture requires direct hardware access
+- CPU inference sufficient for sliding-window approach
+
+**Deployment Flow:**
+```
+Local Webcam → Frame Capture → Preprocessing → 
+    ↓
+Sliding-Window Buffer (64 frames) → 
+    ↓
+Trained Model (from Colab) → Gloss Prediction → 
+    ↓
+Translation → TTS → Output
+```
+
+---
+
 ## Architecture Diagrams Reference
 
 **Available Diagrams:**

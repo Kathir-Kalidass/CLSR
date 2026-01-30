@@ -1,121 +1,110 @@
-# Real-Time Vision-Based Continuous ISL Recognition & Translation System
-# Requirements for Multi-Feature Attention-Based Sign Language Recognition
-# Compatible with Python 3.12+ and modern deep learning frameworks
-
 # ===== Core Deep Learning Frameworks =====
-torch>=2.4.0  # Latest PyTorch with improved performance and features
-torchvision>=0.19.0  # Computer vision models and utilities
-torchaudio>=2.4.0  # Audio processing (useful for TTS)
-timm>=1.0.9  # PyTorch Image Models - extensive pretrained model collection
-lightning>=2.4.0  # PyTorch Lightning for structured training
+torch>=2.6.0
+torchvision>=0.21.0
+torchaudio>=2.6.0
+timm>=1.0.12
+lightning>=2.6.0
 
 # ===== Computer Vision & Video Processing =====
-opencv-python>=4.10.0  # Latest OpenCV for video/image processing
-mediapipe>=0.10.14  # Google's ML solutions (pose, hands, face detection)
-Pillow>=10.4.0  # PIL fork for image processing
-imageio>=2.35.1  # Reading and writing image/video data
-imageio-ffmpeg>=0.5.1  # FFmpeg backend for video processing
-av>=13.1.0  # Pythonic bindings for FFmpeg libraries
+opencv-python>=4.11.0
+mediapipe>=0.10.21
+Pillow>=11.1.0
+imageio>=2.37.0
+imageio-ffmpeg>=0.5.1
+av>=14.0.1
 
 # ===== Scientific Computing =====
-numpy>=1.26.4,<2.0.0  # Fundamental array computing (pre-2.0 for compatibility)
-scipy>=1.14.1  # Scientific computing and optimization
-scikit-learn>=1.5.2  # Machine learning utilities and metrics
-pandas>=2.2.3  # Data manipulation and analysis
+numpy>=2.2.2
+scipy>=1.15.1
+scikit-learn>=1.6.1
+pandas>=2.2.3
 
 # ===== Natural Language Processing =====
-transformers>=4.46.0  # Hugging Face transformers (T5, BART, BERT, etc.)
-tokenizers>=0.20.3  # Fast tokenizers for transformers
-sentencepiece>=0.2.0  # Tokenization for neural text processing
-nltk>=3.9.1  # Natural language toolkit
-spacy>=3.8.2  # Industrial-strength NLP
-torch-audiomentations>=0.11.1  # Audio augmentation
+transformers>=4.48.0
+tokenizers>=0.21.0
+sentencepiece>=0.2.0
+nltk>=3.9.1
+spacy>=3.8.3
+torch-audiomentations>=0.11.1
 
 # ===== Sequence Modeling & CTC =====
-# Note: ctcdecode may need manual compilation for Python 3.12
-# Alternative: use built-in PyTorch CTC decoder or torchaudio.functional.rnnt_loss
-einops>=0.8.0  # Flexible tensor operations for transformers
-rotary-embedding-torch>=0.8.4  # Rotary positional embeddings
+einops>=0.8.0
+rotary-embedding-torch>=0.8.4
 
 # ===== Text-to-Speech =====
-gTTS>=2.5.3  # Google Text-to-Speech API wrapper
-pyttsx3>=2.98  # Offline TTS engine
-TTS>=0.22.0  # Coqui TTS - neural text-to-speech
-soundfile>=0.12.1  # Audio file I/O
-librosa>=0.10.2  # Audio analysis and processing
+gTTS>=2.5.3
+pyttsx3>=2.98
+soundfile>=0.12.1
+librosa>=0.10.2
 
 # ===== Data Processing & Augmentation =====
-albumentations>=1.4.18  # Advanced image augmentation library
-kornia>=0.7.3  # Differentiable computer vision library (GPU-accelerated)
-audiomentations>=0.36.0  # Audio data augmentation
+albumentations>=1.4.23
+kornia>=0.7.4
+audiomentations>=0.37.0
 
 # ===== Visualization & Plotting =====
-matplotlib>=3.9.2  # Plotting library
-seaborn>=0.13.2  # Statistical data visualization
-plotly>=5.24.1  # Interactive plotting
-tensorboard>=2.18.0  # TensorBoard for experiment visualization
+matplotlib>=3.10.0
+seaborn>=0.13.2
+plotly>=5.24.2
+tensorboard>=2.19.0
 
 # ===== Configuration & Logging =====
-PyYAML>=6.0.2  # YAML parser and emitter
-omegaconf>=2.3.0  # Flexible configuration system
-hydra-core>=1.3.2  # Configuration management framework
-python-dotenv>=1.0.1  # Environment variable management
-loguru>=0.7.2  # Simplified logging
+PyYAML>=6.0.2
+omegaconf>=2.3.0
+hydra-core>=1.3.2
+python-dotenv>=1.0.1
+loguru>=0.7.2
 
 # ===== Experiment Tracking =====
-wandb>=0.18.7  # Weights & Biases MLOps platform
-mlflow>=2.17.2  # ML lifecycle management
+wandb>=0.19.1
+mlflow>=2.20.2
 
 # ===== Progress & Utilities =====
-tqdm>=4.67.1  # Progress bars
-colorama>=0.4.6  # Cross-platform colored terminal text
-rich>=13.9.4  # Rich text and beautiful formatting
-typer>=0.15.1  # CLI creation with type hints
+tqdm>=4.67.1
+colorama>=0.4.6
+rich>=13.10.1
+typer>=0.15.2
 
-# ===== Web Framework (for deployment) =====
-fastapi>=0.115.6  # Modern async web framework
-uvicorn[standard]>=0.32.1  # Lightning-fast ASGI server
-pydantic>=2.10.3  # Data validation using Python type hints
-python-multipart>=0.0.17  # Multipart form data parser
-websockets>=14.1  # WebSocket client and server
-
-# Optional web alternatives:
-# flask>=3.0.3  # Lightweight WSGI web framework
-# streamlit>=1.40.2  # Rapid web app development
+# ===== Web Framework =====
+fastapi>=0.116.0
+uvicorn[standard]>=0.34.0
+pydantic>=2.11.0
+python-multipart>=0.0.20
+websockets>=14.2
 
 # ===== Video & Dataset Loaders =====
-decord>=0.6.0  # Efficient video reader
-pytorchvideo>=0.1.5  # PyTorch video understanding library
+decord>=0.6.0
+pytorchvideo>=0.1.5
 
 # ===== Model Optimization & Deployment =====
-onnx>=1.17.0  # Open Neural Network Exchange
-onnxruntime>=1.20.1  # ONNX Runtime for inference
-optimum>=1.23.3  # Hugging Face model optimization
-accelerate>=1.2.1  # PyTorch distributed training
+onnx>=1.18.0
+onnxruntime>=1.21.0
+optimum>=1.24.0
+accelerate>=1.3.1
 
 # ===== Testing & Code Quality =====
-pytest>=8.3.4  # Testing framework
-pytest-cov>=6.0.0  # Coverage plugin for pytest
-pytest-asyncio>=0.24.0  # Async support for pytest
-black>=24.10.0  # Code formatter
-ruff>=0.8.4  # Fast Python linter (replaces flake8, isort, etc.)
-mypy>=1.13.0  # Static type checker
+pytest>=8.3.5
+pytest-cov>=6.0.0
+pytest-asyncio>=0.25.2
+black>=24.12.0
+ruff>=0.9.3
+mypy>=1.14.1
 
 # ===== Development Tools =====
-ipython>=8.29.0  # Enhanced interactive Python shell
-jupyter>=1.1.1  # Jupyter metapackage
-jupyterlab>=4.3.3  # JupyterLab environment
-notebook>=7.3.1  # Jupyter notebook
+ipython>=8.32.0
+jupyter>=1.1.1
+jupyterlab>=4.4.2
+notebook>=7.3.3
 
 # ===== File I/O & Serialization =====
-h5py>=3.12.1  # HDF5 file format interface
-zarr>=2.18.3  # Chunked, compressed N-dimensional arrays
-pyarrow>=18.1.0  # Apache Arrow Python bindings
+h5py>=3.13.0
+zarr>=3.0.3
+pyarrow>=19.0.0
 
 # ===== API & HTTP =====
-requests>=2.32.3  # HTTP library
-httpx>=0.28.1  # Next-generation HTTP client
-aiohttp>=3.11.11  # Async HTTP client/server
+requests>=2.32.3
+httpx>=0.28.1
+aiohttp>=3.12.1
 
 # ===== Cloud Integration (Optional) =====
 # boto3>=1.35.81  # AWS SDK for Python
@@ -124,34 +113,17 @@ aiohttp>=3.11.11  # Async HTTP client/server
 # azure-ai-ml>=1.22.2  # Azure Machine Learning SDK
 
 # ===== Performance Monitoring =====
-psutil>=6.1.0  # System and process utilities
-py-cpuinfo>=9.0.0  # CPU information
-gputil>=1.4.0  # GPU utilization monitoring
-nvitop>=1.3.2  # Interactive NVIDIA GPU monitoring
+psutil>=6.2.0
+py-cpuinfo>=9.0.0
+gputil>=1.4.0
+nvitop>=1.4.0
 
 # ===== Additional Utilities =====
-python-dateutil>=2.9.0  # Date/time utilities
-jsonschema>=4.23.0  # JSON schema validation
-click>=8.1.7  # Command-line interface creation
-fire>=0.7.1  # Automatic CLI generation
+python-dateutil>=2.9.0
+jsonschema>=4.23.0
+click>=8.1.7
+fire>=0.7.1
 
 # ===== Data Validation =====
-pydantic-settings>=2.6.1  # Settings management with Pydantic
-validators>=0.34.0  # Data validation
-
-# System Requirements:
-# - Python 3.12+
-# - CUDA 12.1+ (for GPU support with PyTorch 2.4+)
-# - FFmpeg (for video processing)
-# - 16GB+ RAM recommended
-# - GPU with 8GB+ VRAM recommended for training
-
-# Installation Notes:
-# For GPU support (CUDA 12.1):
-#   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-# 
-# For CPU-only:
-#   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-#
-# MediaPipe may require: pip install mediapipe --no-binary mediapipe (if issues arise)
-# Decord may need manual installation from source for Python 3.12
+pydantic-settings>=2.7.1
+validators>=0.34.0
