@@ -1,0 +1,408 @@
+# CSLR Project .gitignore
+# Real-Time Vision-Based Continuous ISL Recognition & Translation System
+
+# ============================================================================
+# Python
+# ============================================================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.conda/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# ============================================================================
+# Machine Learning / Deep Learning
+# ============================================================================
+# PyTorch
+*.pt
+*.pth
+*.ckpt
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+
+# Model checkpoints and weights
+checkpoints/
+checkpoint/
+weights/
+models/saved/
+pretrained/
+saved_models/
+
+# ONNX models
+*.onnx
+*.pb
+
+# TensorFlow
+*.tfrecord
+*.tflite
+
+# ============================================================================
+# Experiment Tracking & Logs
+# ============================================================================
+# Weights & Biases
+wandb/
+*.wandb
+
+# MLflow
+mlruns/
+mlflow/
+
+# TensorBoard
+runs/
+logs/
+tensorboard/
+lightning_logs/
+tb_logs/
+
+# Training outputs
+outputs/
+results/
+experiments/output/
+train_logs/
+
+# ============================================================================
+# Datasets & Large Files
+# ============================================================================
+# Video datasets
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.flv
+*.wmv
+*.webm
+
+# Image datasets (but keep small example images)
+# Uncomment if you have large image datasets
+# *.jpg
+# *.jpeg
+# *.png
+# *.bmp
+
+# Data directories (adjust based on your structure)
+data/raw/
+data/processed/
+data/videos/
+data/frames/
+datasets/
+dataset/videos/
+dataset/raw/
+
+# Specific reference data folders (large datasets)
+references/NLA-SLR/data/
+references/TwoStreamNetwork/data/*/videos/
+references/TwoStreamNetwork/data/*/features/
+references/Online/CSLR/data/
+references/Online/SLT/data/
+
+# Pose/landmark extracted files
+*.npy
+*.npz
+poses/
+landmarks/
+features/
+extracted_features/
+
+# HDF5 data files
+*.hdf
+*.h5
+
+# Compressed data archives
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# ============================================================================
+# Windows-specific
+# ============================================================================
+# Windows security/metadata files
+*:Zone.Identifier
+*.Zone.Identifier
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# ============================================================================
+# macOS
+# ============================================================================
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# ============================================================================
+# Linux
+# ============================================================================
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ============================================================================
+# IDEs & Editors
+# ============================================================================
+# VSCode
+.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+.history/
+*.vsix
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Sublime Text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+Session.vim
+Sessionx.vim
+.netrwhist
+tags
+[._]*.un~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ============================================================================
+# Project-specific
+# ============================================================================
+# Application outputs
+application/output/
+application/cache/
+application/temp/
+application/tmp/
+
+# Generated pose files
+*_pose.json
+*_landmarks.json
+
+# Demo outputs
+demo/output/
+demo/recordings/
+
+# Test outputs
+test_output/
+test_results/
+
+# Temporary processing files
+temp/
+tmp/
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Audio files (generated TTS)
+*.wav
+*.mp3
+*.ogg
+*.flac
+
+# Download cache
+downloads/
+.cache/
+
+# Experiment configs (keep templates, ignore runs)
+experiments/run_*/
+configs/local_*.yaml
+configs/debug_*.yaml
+
+# ============================================================================
+# Documentation (Keep most, ignore builds)
+# ============================================================================
+# Keep: doc/, report_pages/
+# Ignore: generated documentation builds
+doc/_build/
+doc/build/
+_build/
+*.pdf.bak
+
+# ============================================================================
+# Database files
+# ============================================================================
+*.db
+*.sqlite
+*.sqlite3
+
+# ============================================================================
+# Miscellaneous
+# ============================================================================
+# System files
+*.log
+*.bak
+*.orig
+*.rej
+*.swp
+*.swo
+*~
+
+# Performance profiling
+*.prof
+*.lprof
+*.pyprof
+
+# Secrets and credentials
+.env.local
+.env.*.local
+secrets.yaml
+credentials.json
+*.pem
+*.key
+*.crt
+
+# Large model files from Hugging Face
+.huggingface/
+huggingface_cache/
+
+# Plotly/Dash assets
+.dash/
