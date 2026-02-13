@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSLR Pipeline Showcase Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
+  <script defer src="/static/app.js"></script>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body class="min-h-screen text-slate-100">
+  <div class="bg-layer"></div>
+
+  <main class="relative z-10 mx-auto max-w-7xl px-4 py-6 md:px-8">
+    <header class="mb-6 rounded-2xl border border-white/10 bg-black/35 p-4 backdrop-blur-xl">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 class="title-main">CSLR Dynamic Pipeline Demo</h1>
+          <p class="text-base text-slate-300">Live module parsing, stage-by-stage processing, and real-time animation showcase</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3 text-base">
+          <div class="status-dot" id="statusDot"></div>
+          <span id="statusText">Connecting...</span>
+          <span id="latencyPill" class="pill-cyan">Latency: -- ms</span>
+          <span id="fpsPill" class="pill-green">FPS: --</span>
+          <span id="werPill" class="pill-amber">WER: --</span>
+          <span id="bleuPill" class="pill-violet">BLEU: --</span>
+        </div>
+      </div>
+      <div id="evidenceNote" class="evidence-note mt-3">Loading architecture-aligned note...</div>
+    </header>
+
+    <section class="card mb-6 p-4">
+      <h2 class="section-title">Pipeline Motion Bus</h2>
+      <div class="flow-lane" id="flowLane">
+        <div class="flow-track"></div>
+        <div id="flowDot" class="flow-dot"></div>
+        <div class="flow-stages">
+          <div class="flow-stage" data-stage="module1">M1</div>
+          <div class="flow-stage" data-stage="module2">M2</div>
+          <div class="flow-stage" data-stage="module3">M3</div>
+          <div class="flow-stage" data-stage="module4">M4</div>
+          <div class="flow-stage" data-stage="module5">M5</div>
+        </div>
+      </div>
+      <p class="mt-2 text-sm text-slate-400">Dynamic pulse shows frame window parsing moving across modules in real time.</p>
+    </section>
+
+    <section class="grid gap-6 lg:grid-cols-12">
+      <div class="lg:col-span-5 space-y-6">
+        <article class="card p-4">
+          <div class="mb-3 flex items-center justify-between">
+            <h2 class="section-title">Camera Preview (WebRTC)</h2>
+            <button id="cameraBtn" class="rounded-lg bg-cyan-500 px-3 py-2 text-base font-semibold text-slate-900 hover:bg-cyan-300">Start Camera</button>
+          </div>
+          <div id="cameraShell" class="camera-shell">
+            <video id="cam" autoplay playsinline muted class="h-full w-full rounded-xl object-cover"></video>
+          </div>
+          <p class="mt-2 text-sm text-slate-400">Camera border pulse is synchronized with live parsing updates.</p>
+        </article>
+
+        <article class="card p-4">
+          <h2 class="section-title">Live Gloss Stream</h2>
+          <div id="gloss" class="panel-strong">--</div>
+          <p class="mt-2 text-sm text-slate-400">CTC partial decoding stream from active window.</p>
+        </article>
+
+        <article class="card p-4">
+          <h2 class="section-title">Corrected Sentence</h2>
+          <div id="sentence" class="panel-sentence">Waiting for model output...</div>
+          <p class="mt-2 text-sm text-slate-400">Gloss-to-text translation with grammar correction.</p>
+        </article>
+
+        <article class="card p-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <h3 class="sub-title">Confidence</h3>
+              <div class="mt-2 h-4 w-full rounded-full bg-slate-700/70">
+                <div id="confBar" class="h-4 rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400" style="width: 0%"></div>
+              </div>
+              <p id="confText" class="mt-1 text-base text-slate-300">0%</p>
+            </div>
+            <div>
+              <h3 class="sub-title">Audio Output</h3>
+              <div id="audioState" class="panel-audio">idle</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card p-4">
+          <h2 class="section-title">Live Backend Parser Console</h2>
+          <div id="parserConsole" class="parser-console"></div>
+        </article>
+      </div>
+
+      <div class="lg:col-span-7 space-y-6">
+        <article class="card p-4">
+          <h2 class="section-title mb-4">Detailed Modules: Input -> Process -> Output</h2>
+          <div id="moduleGrid" class="grid gap-3 md:grid-cols-2">
+            <div class="module" data-module="module1">
+              <h3 class="module-title">Module 1</h3>
+              <p class="module-field"><span>Input:</span> <span class="in"></span></p>
+              <p class="module-field"><span>Process:</span> <span class="proc"></span></p>
+              <p class="module-field"><span>Output:</span> <span class="out"></span></p>
+              <div class="parser-box"><div class="parser-title">Live Parsing</div><div class="parser-lines"></div></div>
+              <p class="module-note"></p>
+            </div>
+            <div class="module" data-module="module2">
+              <h3 class="module-title">Module 2</h3>
+              <p class="module-field"><span>Input:</span> <span class="in"></span></p>
+              <p class="module-field"><span>Process:</span> <span class="proc"></span></p>
+              <p class="module-field"><span>Output:</span> <span class="out"></span></p>
+              <div class="parser-box"><div class="parser-title">Live Parsing</div><div class="parser-lines"></div></div>
+              <p class="module-note"></p>
+            </div>
+            <div class="module" data-module="module3">
+              <h3 class="module-title">Module 3</h3>
+              <p class="module-field"><span>Input:</span> <span class="in"></span></p>
+              <p class="module-field"><span>Process:</span> <span class="proc"></span></p>
+              <p class="module-field"><span>Output:</span> <span class="out"></span></p>
+              <div class="parser-box"><div class="parser-title">Live Parsing</div><div class="parser-lines"></div></div>
+              <p class="module-note"></p>
+            </div>
+            <div class="module" data-module="module4">
+              <h3 class="module-title">Module 4</h3>
+              <p class="module-field"><span>Input:</span> <span class="in"></span></p>
+              <p class="module-field"><span>Process:</span> <span class="proc"></span></p>
+              <p class="module-field"><span>Output:</span> <span class="out"></span></p>
+              <div class="parser-box"><div class="parser-title">Live Parsing</div><div class="parser-lines"></div></div>
+              <p class="module-note"></p>
+            </div>
+            <div class="module md:col-span-2" data-module="module5">
+              <h3 class="module-title">Module 5</h3>
+              <p class="module-field"><span>Input:</span> <span class="in"></span></p>
+              <p class="module-field"><span>Process:</span> <span class="proc"></span></p>
+              <p class="module-field"><span>Output:</span> <span class="out"></span></p>
+              <div class="parser-box"><div class="parser-title">Live Parsing</div><div class="parser-lines"></div></div>
+              <p class="module-note"></p>
+            </div>
+          </div>
+        </article>
+
+        <article class="card p-4">
+          <h2 class="section-title mb-3">Architecture Diagram Alignment</h2>
+          <div class="diagram-grid">
+            <div class="diagram-item" data-module="module1">
+              <img src="/report-diagrams/sign_archi-Module1.png" alt="Module1 architecture" />
+              <p>Module 1 Diagram</p>
+            </div>
+            <div class="diagram-item" data-module="module2">
+              <img src="/report-diagrams/sign_archi-Module2.png" alt="Module2 architecture" />
+              <p>Module 2 Diagram</p>
+            </div>
+            <div class="diagram-item" data-module="module3">
+              <img src="/report-diagrams/sign_archi-module3.png" alt="Module3 architecture" />
+              <p>Module 3 Diagram</p>
+            </div>
+            <div class="diagram-item" data-module="module4">
+              <img src="/report-diagrams/sign_archi-module4.png" alt="Module4 architecture" />
+              <p>Module 4 Diagram</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
