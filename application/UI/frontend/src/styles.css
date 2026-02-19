@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+.bg-space {
+  background:
+    radial-gradient(circle at 8% 14%, rgba(56, 189, 248, 0.45), transparent 32%),
+    radial-gradient(circle at 90% 20%, rgba(232, 121, 249, 0.38), transparent 36%),
+    radial-gradient(circle at 80% 78%, rgba(251, 146, 60, 0.28), transparent 36%),
+    linear-gradient(140deg, #12153a 0%, #1e1b4b 36%, #22305c 62%, #2a1e62 100%);
+}
+
+.glass-panel {
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.06));
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+}

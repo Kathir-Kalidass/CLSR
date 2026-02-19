@@ -40,30 +40,115 @@ class DemoEngine:
         ]
         self.sentences = [
             "Hello, how are you?",
-            "I will go to school tomorrow.",
+            "I am going to school tomorrow.",
             "Where is the red book?",
             "What is your name?",
             "I am fine, thank you.",
         ]
-        self.pipeline_order = ["module1", "module2", "module3", "module4", "module5"]
-        self.evidence_notes = [
-            "Dual-stream RGB+Pose follows 01_project_overview_merged.md and architecture mapping.",
-            "Attention fusion and temporal modeling align with Module2 flow in 03_complete_modular_flow.md.",
-            "CTC decoding and sliding-window inference follow CSLR_Project_Report.md real-time constraints.",
-            "Gloss-to-text refinement reflects language correction design in 02_architecture_overview.md.",
-            "Output text+speech delivery maps to sign_archi-module4 and deployment workflow.",
+        self.pipeline_order = [
+            "module1",
+            "module2",
+            "module3",
+            "module4",
+            "module5",
+            "module6",
+            "module7",
         ]
 
-    def _module_payload(self, tick: int, client_state: dict[str, Any] | None = None) -> dict[str, Any]:
-        client_state = client_state or {}
+    def _idle_payload(self, client_state: dict[str, Any]) -> dict[str, Any]:
+        return {
+            "timestamp": time.time(),
+            "tick": client_state.get("tick", 0),
+            "status": "idle",
+            "latency_ms": 0,
+            "fps": 0,
+            "confidence": 0.0,
+            "audio_state": "disabled" if not client_state.get("tts_enabled", True) else "idle",
+            "partial_gloss": "--",
+            "final_sentence": "Press Start to run real-time pipeline",
+            "active_stage": "module1",
+            "pipeline_order": self.pipeline_order,
+            "metrics": {
+                "wer_proxy": 0.0,
+                "bleu_proxy": 0.0,
+                "window_frames": 64,
+                "stride": 32,
+                "accuracy_proxy": 0.0,
+            },
+            "transcript_history": client_state.get("transcript_history", []),
+            "control_state": {
+                "running": False,
+                "tts_enabled": client_state.get("tts_enabled", True),
+                "camera_active": bool(client_state.get("camera_active", False)),
+            },
+            "module1": {
+                "title": "Module 1: Video Acquisition + Preprocessing",
+                "input": "Webcam stream",
+                "process": "Capture -> sample -> crop ROI -> normalize + pose extraction",
+                "output": "RGB tensor + Pose tensor",
+                "note": "Pipeline paused.",
+                "parse": ["waiting_for_start=true"],
+            },
+            "module2": {
+                "title": "Module 2: Dual Feature Extraction",
+                "input": "RGB + Pose tensors",
+                "process": "ResNet18 RGB stream + MLP pose stream",
+                "output": "Feature vectors",
+                "note": "No active window.",
+                "parse": ["window_ready=false"],
+            },
+            "module3": {
+                "title": "Module 3: Attention Fusion + Temporal Model",
+                "input": "RGB and pose features",
+                "process": "Attention fusion + BiLSTM + CTC",
+                "output": "Gloss tokens",
+                "note": "Waiting for buffered frames.",
+                "parse": ["stride=32, window_size=64"],
+            },
+            "module4": {
+                "title": "Module 4: Gloss Post-Processing",
+                "input": "Raw gloss sequence",
+                "process": "Deduplicate + confidence filtering",
+                "output": "Clean gloss string",
+                "note": "No active prediction.",
+                "parse": ["dedup_active=true"],
+            },
+            "module5": {
+                "title": "Module 5: Gloss -> Sentence",
+                "input": "Clean gloss",
+                "process": "Rule-based grammar correction",
+                "output": "Readable English sentence",
+                "note": "Waiting for gloss input.",
+                "parse": ["grammar_mode=rule_based"],
+            },
+            "module6": {
+                "title": "Module 6: Text-to-Speech",
+                "input": "Corrected sentence",
+                "process": "Queue and play speech",
+                "output": "Audio output",
+                "note": "TTS disabled" if not client_state.get("tts_enabled", True) else "Ready",
+                "parse": [f"tts_enabled={client_state.get('tts_enabled', True)}"],
+            },
+            "module7": {
+                "title": "Module 7: Live Metrics",
+                "input": "Prediction stream",
+                "process": "Compute FPS, latency, WER, BLEU, accuracy",
+                "output": "Dashboard metrics",
+                "note": "Metrics reset while idle.",
+                "parse": ["dataset=demo_subset(20)"],
+            },
+            "parser_console": ["[system] idle: waiting for Start"],
+        }
+
+    def _running_payload(self, tick: int, client_state: dict[str, Any]) -> dict[str, Any]:
         camera_active = bool(client_state.get("camera_active", False))
         frame_hint = int(client_state.get("frame_hint", 0))
         client_resolution = str(client_state.get("resolution", "unknown"))
 
-        fps = random.randint(24, 30)
+        fps = random.randint(16, 27)
         frame_count = 64
-        confidence = round(random.uniform(0.74, 0.96), 2)
-        latency_ms = random.randint(255, 455)
+        confidence = round(random.uniform(0.74, 0.95), 2)
+        latency_ms = random.randint(240, 420)
 
         sample_gloss = random.sample(self.gloss_tokens, k=3)
         sentence = self.sentences[tick % len(self.sentences)]
@@ -71,72 +156,86 @@ class DemoEngine:
 
         window_start = tick * 32
         window_end = window_start + frame_count - 1
-        pose_detected = random.randint(66, 75)
-        hand_visibility = round(random.uniform(0.78, 0.99), 2)
+        pose_detected = random.randint(68, 75)
+        hand_visibility = round(random.uniform(0.81, 0.99), 2)
         attn_rgb = round(random.uniform(0.42, 0.71), 2)
         attn_pose = round(1.0 - attn_rgb, 2)
-        beam_width = random.choice([5, 6, 8])
+
+        history = client_state.setdefault("transcript_history", [])
+        if not history or history[0] != sentence:
+            history.insert(0, sentence)
+        client_state["transcript_history"] = history[:12]
 
         module_data = {
             "module1": {
                 "title": "Module 1: Video Acquisition + Preprocessing",
-                "input": f"Live camera stream ({fps} FPS), raw RGB frames, client={client_resolution}",
-                "process": "Decode -> sample -> resize 224x224 -> normalize -> pose/landmark extraction",
-                "output": "RGB tensor 64x3x224x224 | Pose tensor 64x75x3",
-                "note": "Implements preprocessing and temporal standardization before fusion.",
+                "input": f"Live stream ({client_resolution})",
+                "process": "Motion filter -> frame skip -> ROI crop -> resize 224x224",
+                "output": "RGB: 64x3x224x224 | Pose: 64x75x2",
+                "note": "4GB-safe preprocessing with adaptive frame retention.",
                 "parse": [
+                    f"camera_active={camera_active}, frame_hint={frame_hint}",
                     f"window=frames[{window_start}:{window_end}] stride=32",
-                    f"client_camera_active={camera_active} | client_frame_hint={frame_hint}",
                     f"pose_landmarks={pose_detected}/75, hand_visibility={hand_visibility}",
-                    "normalization=ImageNet(mean/std), corrupt_frame_check=passed",
                 ],
             },
             "module2": {
-                "title": "Module 2: Feature Extraction + Attention Fusion",
-                "input": "RGB tensor + Pose tensor",
-                "process": "ResNet RGB stream + Pose encoder + cross-modal attention fusion",
-                "output": "Fused embedding sequence 64x512",
-                "note": "Follows efficient multi-feature attention design from referenced architecture.",
-                "parse": [
-                    "rgb_feat=64x512, pose_feat=64x256",
-                    f"attention_weights: alpha_rgb={attn_rgb}, beta_pose={attn_pose}",
-                    "fusion_out=64x512, fp16_path=enabled",
-                ],
+                "title": "Module 2: Dual Feature Extraction",
+                "input": "RGB + Pose tensors",
+                "process": "ResNet18 (RGB) + MLP(150->256 pose)",
+                "output": "rgb_feat:64x512 | pose_feat:64x256",
+                "note": "Efficient extractor setup for real-time inference.",
+                "parse": ["resnet18_backbone=active", "pose_encoder=linear_relu_linear", "precision=fp16_path"],
             },
             "module3": {
-                "title": "Module 3: Temporal Modeling + CTC Decoding",
-                "input": "Fused sequence embeddings",
-                "process": "BiLSTM/Transformer temporal encoder + CTC logits + beam decoding",
-                "output": f"Partial gloss stream: {partial}",
-                "note": "Sliding-window decoding keeps latency in real-time budget.",
+                "title": "Module 3: Attention Fusion + Temporal Model",
+                "input": "rgb_feat + pose_feat",
+                "process": "alpha/beta attention + BiLSTM + CTC logits",
+                "output": f"partial_gloss={partial}",
+                "note": "Sliding-window predictions every 32 frames.",
                 "parse": [
-                    f"temporal_in=64x512 -> ctc_logits=64x{len(self.gloss_tokens) + 1}",
-                    f"beam_width={beam_width}, blank_pruned={random.randint(11, 24)}",
-                    f"gloss_partial='{partial}'",
+                    f"attention alpha_rgb={attn_rgb}, beta_pose={attn_pose}",
+                    "lstm=2_layers_bidirectional hidden=512",
+                    "ctc_decode=greedy(blank_prune=true)",
                 ],
             },
             "module4": {
-                "title": "Module 4: Translation + Grammar Correction",
-                "input": f"Gloss tokens: {partial}",
-                "process": "Gloss-to-text translation + grammar correction + fluency adjustment",
-                "output": sentence,
-                "note": "Converts gloss ordering to fluent English sentence structure.",
-                "parse": [
-                    f"translator_in=[{', '.join(sample_gloss)}]",
-                    "decoder=t5/bart-style seq2seq, grammar_fix=on",
-                    f"sentence_out='{sentence}'",
-                ],
+                "title": "Module 4: Caption Buffer & Post-Processing",
+                "input": partial,
+                "process": "merge_repeats + confidence thresholding",
+                "output": partial,
+                "note": "Reduces repeated gloss artifacts in stream.",
+                "parse": ["dedup=true", f"confidence={confidence}", "min_conf=0.65"],
             },
             "module5": {
-                "title": "Module 5: Output Layer (Caption + TTS)",
+                "title": "Module 5: AI Sentence Correction",
+                "input": partial,
+                "process": "rule-based grammar correction",
+                "output": sentence,
+                "note": "Converts gloss order into natural English sentence.",
+                "parse": ["mode=rule_based", "sov_to_svo=true", f"sentence='{sentence}'"],
+            },
+            "module6": {
+                "title": "Module 6: Text-to-Speech",
                 "input": sentence,
-                "process": "Subtitle render + confidence tagging + TTS queue/playback",
-                "output": f"Caption published, audio_state={random.choice(['playing', 'ready'])}",
-                "note": "Final multimodal output pipeline for text and speech feedback.",
+                "process": "queue -> synthesize -> play",
+                "output": "audio=playing" if client_state.get("tts_enabled", True) else "audio=muted",
+                "note": "pyttsx3/gTTS compatible speech module.",
                 "parse": [
-                    f"subtitle_commit_ts={int(time.time() * 1000)}",
-                    f"tts_voice={random.choice(['female_neural', 'male_neural'])}, rate={random.choice(['0.95x', '1.0x', '1.05x'])}",
-                    f"end_to_end_latency={latency_ms}ms",
+                    f"tts_enabled={client_state.get('tts_enabled', True)}",
+                    f"voice_rate={random.choice(['0.95x', '1.0x', '1.05x'])}",
+                ],
+            },
+            "module7": {
+                "title": "Module 7: Performance Metrics",
+                "input": "predictions + references",
+                "process": "FPS + latency + BLEU + WER + confusion proxy",
+                "output": f"fps={fps}, latency={latency_ms}ms",
+                "note": "Demo metrics computed on small rolling sample.",
+                "parse": [
+                    f"accuracy={round(random.uniform(0.73, 0.9), 2)}",
+                    f"bleu={round(random.uniform(0.31, 0.47), 2)}",
+                    f"wer={round(random.uniform(0.12, 0.23), 2)}",
                 ],
             },
         }
@@ -152,33 +251,48 @@ class DemoEngine:
             "latency_ms": latency_ms,
             "fps": fps,
             "confidence": confidence,
-            "audio_state": random.choice(["speaking", "queued", "idle"]),
+            "audio_state": "speaking" if client_state.get("tts_enabled", True) else "muted",
             "partial_gloss": partial,
             "final_sentence": sentence,
             "active_stage": self.pipeline_order[tick % len(self.pipeline_order)],
             "pipeline_order": self.pipeline_order,
-            "evidence_note": self.evidence_notes[tick % len(self.evidence_notes)],
             "metrics": {
-                "wer_proxy": round(random.uniform(0.11, 0.24), 3),
-                "bleu_proxy": round(random.uniform(0.29, 0.41), 3),
+                "wer_proxy": round(random.uniform(0.12, 0.23), 3),
+                "bleu_proxy": round(random.uniform(0.31, 0.47), 3),
                 "window_frames": frame_count,
                 "stride": 32,
+                "accuracy_proxy": round(random.uniform(0.73, 0.9), 3),
+            },
+            "transcript_history": client_state.get("transcript_history", []),
+            "control_state": {
+                "running": True,
+                "tts_enabled": client_state.get("tts_enabled", True),
+                "camera_active": camera_active,
             },
             "module1": module_data["module1"],
             "module2": module_data["module2"],
             "module3": module_data["module3"],
             "module4": module_data["module4"],
             "module5": module_data["module5"],
+            "module6": module_data["module6"],
+            "module7": module_data["module7"],
             "parser_console": parser_console,
         }
+
+    def make_payload(self, tick: int, client_state: dict[str, Any]) -> dict[str, Any]:
+        running = bool(client_state.get("running", False))
+        if not running:
+            return self._idle_payload(client_state)
+        return self._running_payload(tick=tick, client_state=client_state)
 
     async def stream(self, websocket: WebSocket, client_state: dict[str, Any]) -> None:
         tick = 0
         while True:
-            payload = self._module_payload(tick, client_state=client_state)
+            client_state["tick"] = tick
+            payload = self.make_payload(tick=tick, client_state=client_state)
             await websocket.send_text(json.dumps(payload))
             tick += 1
-            await asyncio.sleep(1.05)
+            await asyncio.sleep(0.95)
 
 
 engine = DemoEngine()
@@ -196,6 +310,9 @@ async def websocket_demo(websocket: WebSocket) -> None:
         "camera_active": False,
         "frame_hint": 0,
         "resolution": "unknown",
+        "running": False,
+        "tts_enabled": True,
+        "transcript_history": [],
     }
 
     async def recv_client() -> None:
@@ -206,10 +323,21 @@ async def websocket_demo(websocket: WebSocket) -> None:
             except json.JSONDecodeError:
                 continue
 
-            if message.get("type") == "client_video_stats":
+            msg_type = message.get("type")
+            if msg_type == "client_video_stats":
                 client_state["camera_active"] = bool(message.get("camera_active", False))
                 client_state["frame_hint"] = int(message.get("frame_hint", 0))
                 client_state["resolution"] = str(message.get("resolution", "unknown"))
+            elif msg_type == "control":
+                action = message.get("action", "")
+                if action == "start":
+                    client_state["running"] = True
+                elif action == "stop":
+                    client_state["running"] = False
+                elif action == "clear":
+                    client_state["transcript_history"] = []
+                elif action == "toggle_tts":
+                    client_state["tts_enabled"] = not bool(client_state.get("tts_enabled", True))
 
     try:
         sender = asyncio.create_task(engine.stream(websocket, client_state=client_state))
